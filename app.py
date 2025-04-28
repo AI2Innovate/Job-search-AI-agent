@@ -132,23 +132,27 @@ if uploaded and st.session_state.cv_keywords is None:
     update_portals(urls)
     new_urls = [u for u in urls if u not in st.session_state.known_jobs]
     save_training_links(new_urls)
+    # Updated Bookmark Button Functionality
     for u in new_urls[:5]:
         job = scrape_job_post(u)
         with st.chat_message("assistant"):
-            # Escape newline properly
             st.markdown(f"**{job['title']}**  \n{job['url']}")
-            if st.button("Bookmark", key=f"bm_{u}"):
+            if st.button("Bookmark", key=f"bm3_{u}"):
+                # Update bookmarks without refreshing the page
                 st.session_state.bookmarks.add(u)
                 save_bookmarks()
-                st.experimental_rerun()
+                st.toast("Bookmark added successfully!")
 
 # Manual Search Panel
 with st.expander("🔎 Manual Job Search"):
     role = st.text_input("Role", key="role_input")
     exp = st.text_input("Experience", key="exp_input")
     loc = st.text_input("Location", key="loc_input")
+    job_type = st.selectbox("Type", ["", "Permanent", "Contract"], key="type_input")
+    work_mode = st.selectbox("Work Mode", ["", "Hybrid", "Onsite", "Remote"], key="mode_input")
+
     if st.button("Search Jobs", key="manual_search_btn"):
-        manual_q = " ".join(filter(None, [role, exp, loc]))
+        manual_q = " ".join(filter(None, [role, exp, loc, job_type, work_mode]))
         if st.session_state.cv_keywords:
             manual_q += " " + st.session_state.cv_keywords
         add_message("user", manual_q)
@@ -180,24 +184,35 @@ user_input = st.chat_input("Type your job search query…")
 if user_input:
     add_message("user", user_input)
     combined = user_input + (" " + st.session_state.cv_keywords if st.session_state.cv_keywords else "")
+    
+    # Generate queries for both job portals and general web search
     queries = generate_search_queries(combined)
     extra = propose_additional_queries(combined, queries)
     all_q = list(dict.fromkeys([q for q in queries if isinstance(q, str)] + [q for q in extra if isinstance(q, str)]))
-    links = generate_query_links(all_q)
-    add_message("assistant", "**🔗 Generated Query Links:**")
-    st.chat_message("assistant").markdown("\n".join(f"- [{u}]({u})" for u in links))
-
-    urls = []
+    
+    # Generate links for job portals
+    portal_links = generate_query_links(all_q)
+    
+    # Perform a general web search for additional links
+    general_links = []
     for q in all_q:
-        urls.extend(search_jobs(q))
-    update_portals(urls)
-    new_urls = [u for u in urls if u not in st.session_state.known_jobs]
+        general_links.extend(search_jobs(q))  # Assuming search_jobs can handle general web searches
+    
+    # Combine and display all links
+    all_links = list(dict.fromkeys(portal_links + general_links))
+    add_message("assistant", "**🔗 Generated Query Links:**")
+    st.chat_message("assistant").markdown("\n".join(f"- [{u}]({u})" for u in all_links))
+
+    # Update portals and save training links
+    update_portals(general_links)
+    new_urls = [u for u in general_links if u not in st.session_state.known_jobs]
     save_training_links(new_urls)
     for u in new_urls[:5]:
         job = scrape_job_post(u)
         with st.chat_message("assistant"):
             st.markdown(f"**{job['title']}**  \n{job['url']}")
             if st.button("Bookmark", key=f"bm3_{u}"):
+                # Update bookmarks without refreshing the page
                 st.session_state.bookmarks.add(u)
                 save_bookmarks()
-                st.experimental_rerun()
+                st.toast("Bookmark added successfully!")
