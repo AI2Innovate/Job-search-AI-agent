@@ -1,6 +1,6 @@
-## AI Job search Agent
+# AI Job search Agent
 
-# New Feature in progress development 
+## New Feature in progress development 
 - promopt template for searching & scrape
 - real and fake job posting list with links in a table format
 - explain and build new features like cv parsing & look for exact job macthes
