@@ -6,7 +6,7 @@
 - explain and build new features like cv parsing & look for exact job macthes
 
 
- AI-powered job search assistant with the following functionalities:
+## AI-powered job search assistant with the following functionalities:
 
 1. Job Search and Query Generation
 Generate Search Queries: Uses keywords (e.g., from a CV or user input) to generate concise job search queries via the generate_search_queries function in search_agent.py.
