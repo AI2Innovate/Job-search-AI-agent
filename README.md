@@ -4,6 +4,7 @@
 - promopt template for searching & scrape
 - real and fake job posting list with links in a table format
 - explain and build new features like cv parsing & look for exact job macthes
+- applied button so applied jobs will not be searched again 
 
 
 ## AI-powered job search assistant with the following functionalities:
