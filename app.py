@@ -150,9 +150,10 @@ with st.expander("🔎 Manual Job Search"):
     loc = st.text_input("Location", key="loc_input")
     job_type = st.selectbox("Type", ["", "Permanent", "Contract"], key="type_input")
     work_mode = st.selectbox("Work Mode", ["", "Hybrid", "Onsite", "Remote"], key="mode_input")
+    days_limit = st.number_input("Posted Within Last (Days)", min_value=0, step=1, key="days_limit_input")
 
     if st.button("Search Jobs", key="manual_search_btn"):
-        manual_q = " ".join(filter(None, [role, exp, loc, job_type, work_mode]))
+        manual_q = " ".join(filter(None, [role, exp, loc, job_type, work_mode, f"Posted within last {days_limit} days" if days_limit > 0 else ""]))
         if st.session_state.cv_keywords:
             manual_q += " " + st.session_state.cv_keywords
         add_message("user", manual_q)
